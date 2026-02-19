@@ -1,0 +1,22 @@
+Steps to achieve the project goal
+
+1. Set up uv environment in your project directory
+   a. First check if uv setup is there "uv --version"
+   b. If set up not there, run "powershell -c "irm https://astral.sh/uv/install.ps1 | iex" in powershell
+   c. In environment variable set up the path
+   d. Once setup is done, run "uv init ." in your terminal. Your uv environment will be set up.
+
+2. Create a virtual environment with the help of uv
+   a. Run in terminal "uv venv .venv"  (dont do this)
+   b. Create a requirements.txt file, write the command "python-dotenv"
+   c. Run in terminal "uv add -r requirements.txt"
+3. Run in terminal "uv add ipykernel"   
+4. Run in terminal "uv sync"  (Add synchronization between dependencies in files and folders)
+5. Create the required folders for our project
+   a. data (Here, we will store the data incoming from user, also will store processed data here)
+   b. multi_doc_chat (This is where we will write the actual modular structure code)
+      It includes - 1. config 2. exception  3. logger 4. model 5. prompts 6. src 7. utils
+6. Create a notebook folder for running experiments.
+7. Create a static folder -> style.css (Here, we will have the css files)
+8. Create a templates folder -> html files (Here, we will have html files for the frontend part)
+9. Create a test folder, here we will do the testing part like unit test, integration test       
