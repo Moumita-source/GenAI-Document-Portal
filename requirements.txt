@@ -4,11 +4,15 @@ langchain
 langchain-community
 langchain-core
 
+from_root
+
 langchain-text-splitters
 langchain-google-genai
 faiss-cpu
-
+fastapi
+jinja2
 ipykernel
+uvicorn
 docx2txt
 python-multipart
 langsmith

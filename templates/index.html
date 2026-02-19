@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MultiDoc Chat (MVP)</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>MultiDoc Chat (MVP)</h1>
+        <p class="subtitle">Upload documents → ask questions about them</p>
+        
+        <!-- Upload form -->
+        <form action="/upload" enctype="multipart/form-data" method="post" class="upload-form">
+            <input name="files" type="file" class="file-input" multiple>
+            <input type="submit" value="Upload" class="upload-btn">
+        </form>
+
+        <!-- Chat window -->
+        <div class="chat-window"> 
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will appear here -->
+            </div>
+            <!-- Chat form (no action/method, JS handles it) -->
+            <form class="chat-input-area"> 
+                <input type="text" name="message" placeholder="Ask something about your documents..." class="chat-input"> 
+                <button type="submit" class="send-btn">Send</button>
+            </form> 
+        </div>
+    </div>
+
+    <!-- JavaScript to handle chat -->
+   <script>
+let sessionId =  null; // global variable to hold session_id
+
+// Handle file upload
+document.querySelector(".upload-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(document.querySelector(".upload-form"));
+    const response = await fetch("/upload", {
+        method: "POST",
+        body: formData
+    });
+    const data = await response.json();
+
+    if (data.session_id) {
+        sessionId = data.session_id; // store session_id globally
+        alert("Upload successful! Session ID: " + sessionId);
+    } else {
+        alert("Upload failed or no session created.");
+    }
+});
+
+// Handle chat
+document.querySelector(".chat-input-area").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const input = document.querySelector(".chat-input");
+    const message = input.value;
+
+    const chatMessages = document.getElementById("chat-messages");
+    const userMsg = document.createElement("div");
+    userMsg.className = "message user";
+    userMsg.textContent = message;
+    chatMessages.appendChild(userMsg);
+
+    // If no session yet, show warning
+    if (!sessionId) {
+        const botMsg = document.createElement("div");
+        botMsg.className = "message bot";
+        botMsg.textContent = "No active session. Please upload a file first.";
+        chatMessages.appendChild(botMsg);
+        input.value = "";
+        return;
+    }
+
+    // Send to backend with session_id
+    const formData = new FormData();
+    formData.append("message", message);
+    formData.append("session_id", sessionId);
+
+    const response = await fetch("/chat", {
+        method: "POST",
+        body: formData
+    });
+    const data = await response.json();
+
+    const botMsg = document.createElement("div");
+    botMsg.className = "message bot";
+    botMsg.textContent = data.bot_reply;
+    chatMessages.appendChild(botMsg);
+
+    input.value = "";
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+</script>
+
+</body>
+</html>
