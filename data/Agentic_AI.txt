@@ -1,0 +1,28 @@
+Agentic AI refers to artificial intelligence systems that go beyond passive response and act with 
+autonomy, reasoning, and tool use. Unlike traditional models that only generate outputs when 
+prompted, agentic systems can plan tasks, select strategies, and orchestrate actions toward a goal.
+ They operate in a loop of perception, planning, and execution: first interpreting the context, 
+ then breaking down the problem into steps, and finally choosing the right tools or APIs to 
+ complete each step.
+
+For example, when asked to summarize a research paper, an agentic AI doesn’t just produce text. It 
+may load the document, parse its structure, extract key sections, and then apply a language model 
+to generate a concise summary. If the input is an image, it might call an OCR service to extract
+text before reasoning about the content. This ability to combine multiple capabilities dynamically
+makes agentic AI more powerful and flexible than static models.
+
+The defining traits of agentic AI are:
+
+Autonomy: It can initiate actions beyond a single prompt.
+
+Reasoning: It decomposes complex tasks into manageable steps.
+
+Tool use: It integrates external services (databases, APIs, search engines) to achieve goals.
+
+Adaptability: It monitors outcomes and adjusts its approach when conditions change.
+
+In practice, agentic AI is the foundation of modern GenAI applications — 
+from chatbots that can book tickets or translate documents, to research assistants that can 
+retrieve data, analyze it, and present insights. It represents a shift from “AI as a 
+passive model” to “AI as an active collaborator,” capable of decision-making, execution, and 
+continuous improvement.

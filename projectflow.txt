@@ -19,4 +19,13 @@ Steps to achieve the project goal
 6. Create a notebook folder for running experiments.
 7. Create a static folder -> style.css (Here, we will have the css files)
 8. Create a templates folder -> html files (Here, we will have html files for the frontend part)
-9. Create a test folder, here we will do the testing part like unit test, integration test       
+9. Create a test folder, here we will do the testing part like unit test, integration test  
+
+----  Lets look at some of the dependencies that we will be installing  -------
+1. google-cloud-vision → Lets you use Google’s Vision API for OCR and image analysis. You can extract text from images, detect objects, or classify content without building your own OCR pipeline.
+2. google-cloud-translate → Provides access to Google’s Translation API. It allows you to translate text between languages programmatically, useful for multilingual GenAI applications.
+3. google-cloud-aiplatform → Connects to Google’s Vertex AI, where you can access Google’s large language models (like PaLM) and manage ML workflows. This is how you run LLMs on Google Cloud instead of OpenAI.
+4. langchain + langchain-community → A framework for orchestrating LLM workflows. It helps you chain prompts, tools, and data sources together (e.g., OCR → translation → LLM → response). The community package adds extra integrations maintained outside the core library.
+5. rapidocr-onnxruntime → A lightweight, local OCR engine that runs on ONNX Runtime. Useful if you want OCR without calling Google Vision (faster, cheaper, and works offline).
+6. python-dotenv → Loads environment variables from a .env file. This keeps your API keys (Google or OpenAI) secure and separate from your code, so you don’t hardcode secrets.
+
