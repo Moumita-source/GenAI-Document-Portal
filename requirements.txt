@@ -8,6 +8,7 @@ from_root
 
 langchain-text-splitters
 langchain-google-genai
+langchain-mongodb
 faiss-cpu
 fastapi
 jinja2
@@ -16,3 +17,4 @@ uvicorn
 docx2txt
 python-multipart
 langsmith
+pymongo

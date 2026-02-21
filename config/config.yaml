@@ -1,0 +1,17 @@
+embedding_model:
+  provider: "google-genai"
+  model_name: "models/gemini-embedding-001"
+  # Uses GOOGLE_API_KEY from .env
+
+retriever:
+  top_k: 10
+  search_type: "mmr"   # Options: "similarity", "mmr", "similarity_score_threshold"
+  fetch_k: 20          # Number of docs to fetch before MMR re-ranking
+  lambda_mult: 0.5     # Diversity vs relevance (0=max diversity, 1=max relevance)
+
+llm:
+  google:
+    provider: "google-genai"
+    model_name: "gemini-2.0-flash"
+    temperature: 0
+    max_output_tokens: 2048
