@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import List
 from multi_doc_chat.src.data_ingestion import DataIngestion, IngestionArtifact
+from multi_doc_chat.src.data_retrieval import DataRetrieval
 
 app = FastAPI()
 
@@ -31,10 +32,12 @@ async def upload_files(files: List[UploadFile] = File(...)):
 @app.post("/chat")
 async def chat_message(session_id: str = Form(...), message: str = Form(...)):
     if not session_id:
-        return {"bot_reply": "No active session. Please upload a file first."}
+        return {"bot_reply": "Please upload a file first."}
 
+    retrieval = DataRetrieval()
+    bot_reply = retrieval.initiate_data_retrieval(session_id= session_id, query= message)
     return {
         "session_id": session_id,
         "user_message": message,
-        "bot_reply": f"This is your active session: {session_id}"
+        "bot_reply": bot_reply
     }

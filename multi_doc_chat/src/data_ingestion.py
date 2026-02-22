@@ -4,6 +4,7 @@ import uuid
 import tempfile
 from multi_doc_chat.configuration.mongodb_connection import MongoDBClient
 from multi_doc_chat.constants import DATABASE_NAME,COLLECTION_NAME, CHUNK_SIZE, CHUNK_OVERLAP, SCHEMA_FILE_PATH, API_KEY
+from multi_doc_chat.constants import SESSION_ID, FILENAME, CHUNK_INDEX, CHUNK_TEXT, META_DATA, EMBEDDING, CREATED_AT, START_INDEX, END_INDEX
 from multi_doc_chat.exception import MyException
 from multi_doc_chat.logger import logging
 from multi_doc_chat.utils.main_utils import read_yaml_file
@@ -89,22 +90,23 @@ class DataIngestion:
             # Generate embeddings
             embeddings_model = GoogleGenerativeAIEmbeddings(
                 model= self._schema_config["embedding_model"]["model_name"],
-                api_key = os.getenv("GOOGLE_API_KEY")
+                api_key = os.getenv("GOOGLE_API_KEY"),
+                output_dimensionality=768
             ) 
             
             # Saving to mongodb
             chunk_docs_for_db = []
             for idx, chunk in enumerate(text_chunks):
                chunk_doc = {
-                   "session_id": session_id,
-                   "filename": file_name,
-                   "chunk_index": idx,
-                   "chunk_text": chunk.page_content,
-                   "metadata": chunk.metadata,
-                   "embedding": embeddings_model.embed_documents([chunk.page_content])[0],
-                   "created_at": self.uploaded_at,
-                   "start_index": chunk.metadata.get("start_index"),
-                   "end_index": chunk.metadata.get("start_index", 0) + len(chunk.page_content)
+                   SESSION_ID: session_id,
+                   FILENAME: file_name,
+                   CHUNK_INDEX: idx,
+                   CHUNK_TEXT: chunk.page_content,
+                   META_DATA: chunk.metadata,
+                   EMBEDDING: embeddings_model.embed_documents([chunk.page_content])[0],
+                   CREATED_AT: self.uploaded_at,
+                   START_INDEX: chunk.metadata.get(START_INDEX),
+                   END_INDEX: chunk.metadata.get(START_INDEX, 0) + len(chunk.page_content)
                    }
                chunk_docs_for_db.append(chunk_doc)
             
@@ -153,7 +155,7 @@ class DataIngestion:
                     elif filename.lower().endswith(".docx"):
                         loader = Docx2txtLoader(tmp_path)    
                     else:
-                        loader = TextLoader(tmp_path)
+                        loader = TextLoader(tmp_path, encoding= "utf-8")
                         
                     documents = loader.load()
                     text_content = "\n".join([doc.page_content for doc in documents])            
