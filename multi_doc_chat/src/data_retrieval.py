@@ -10,9 +10,14 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_mongodb import MongoDBAtlasVectorSearch
 from multi_doc_chat.utils.main_utils import read_yaml_file
 from multi_doc_chat.prompts.prompt_library import RAG_ANSWER_PROMPT
+from collections import deque
 
 from dotenv import load_dotenv 
 load_dotenv()
+
+# In-memory chat history: session_id → deque of (user_message, bot_reply)
+SESSION_HISTORY = {}
+MAX_HISTORY_TURNS = 5
 
 class DataRetrieval:
     def __init__(self):
@@ -110,7 +115,7 @@ class DataRetrieval:
         except Exception as e:
             raise MyException(e, sys) from e  
         
-    def get_answer(self, query: str, session_id: str):
+    def get_answer(self, query: str, session_id: str, history_text: str):
         """
         1. Retrieve relevant chunks
         2. Build context
@@ -132,6 +137,12 @@ class DataRetrieval:
                 
             context = "\n\n".join(context_parts)
             
+            # Combine history + current context
+            full_context = ""
+            if history_text:
+                full_context += history_text + "\n\n"
+            full_context += f"Current context from documents:\n{context}"    
+            
             prompt_text = RAG_ANSWER_PROMPT
             prompt = ChatPromptTemplate.from_template(prompt_text)
             
@@ -145,7 +156,7 @@ class DataRetrieval:
             
             # Build Simple chain
             chain = (
-                {"context": lambda _: context, "question": lambda x: x}
+                {"context": lambda _: full_context, "question": lambda x: x}
                 | prompt
                 | llm
                 | StrOutputParser()
@@ -164,7 +175,33 @@ class DataRetrieval:
         This component does the data retrieval.
         """            
         try:
-            return self.get_answer(query= query, session_id= session_id)
+            logging.info("Initiating the data-retrieval component")
+            
+            # When starting a new session
+            if session_id not in SESSION_HISTORY:
+                SESSION_HISTORY[session_id] = deque(maxlen= MAX_HISTORY_TURNS)
+                
+            history = SESSION_HISTORY[session_id]
+            
+            # Format history as text
+            history_text = ""
+            if history:
+                history_lines = []
+                for turn in history:
+                    user_msg, bot_reply = turn
+                    history_lines.append(f"User: {user_msg}")
+                    history_lines.append(f"Bot: {bot_reply}")
+                history_text = "\n\nPrevious conversation:\n" + "\n".join(history_lines)
+                    
+            answer =  self.get_answer(query= query, session_id= session_id, history_text = history_text)
+            
+            # Save this new turn to history (after getting answer)
+            SESSION_HISTORY[session_id].append((query, answer))
+            
+            logging.info(f"Chat history updated for session {session_id}")
+            
+            return answer
+            
         except Exception as e:
             raise MyException(e, sys) from e
             
